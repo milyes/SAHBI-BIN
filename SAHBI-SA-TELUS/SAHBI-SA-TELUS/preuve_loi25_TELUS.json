@@ -1,0 +1,21 @@
+{
+  "hq": "SAHBI-SA TELUS",
+  "version": "V6.2-DUAL-GOLD-TELUS",
+  "boot": "0.0013ms / 0.0823ms",
+  "ram": "872 bytes",
+  "hash": "529cec5e49052966",
+  "modules": 6,
+  "non_dependance": true,
+  "zero_trust": true,
+  "policy": "DENY_ALL_EXCEPT_VERIFIED",
+  "audit_log": 6,
+  "repo": "milyes/SAHBI-SA",
+  "telus_repo": "milyes/SAHBI-SA-TELUS",
+  "programme": "#AidonsNosPME 2026",
+  "entreprise": "NetSecurePro.ca",
+  "pages": {
+    "pro": "61584016272582",
+    "perso": "Ilyes Zoubirou"
+  },
+  "public_ouvert": true
+}

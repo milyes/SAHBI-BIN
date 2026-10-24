@@ -1,0 +1,97 @@
+From: <Saved by Blink>
+Snapshot-Content-Location: http://127.0.0.1:24985/main/0/storage/emulated/0/Download/LANCER_BIN_.HTML
+Subject: =?utf-8?Q?SAHBI-SA=20V6.2=20DUAL=20GOLD=20=E2=80=94=20Lanceur?=
+Date: Mon, 05 Oct 2026 14:01:47 GMT
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----MultipartBoundary--Mei5vFb23763JQrg4DVVPYl7nkc37eQ9kTAlqsL8uU----"
+
+
+------MultipartBoundary--Mei5vFb23763JQrg4DVVPYl7nkc37eQ9kTAlqsL8uU----
+Content-Type: text/html
+Content-ID: <frame-9AEE3710C8F9B7381DAB73D39CE33092@mhtml.blink>
+Content-Transfer-Encoding: binary
+Content-Location: http://127.0.0.1:24985/main/0/storage/emulated/0/Download/LANCER_BIN_.HTML
+
+<!DOCTYPE html><html lang="fr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="cid:css-2a707870-61b4-4921-8cae-b470ed56afd4@mhtml.blink" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>SAHBI-SA V6.2 DUAL GOLD — Lanceur</title>
+
+</head>
+<body>
+<main>
+<h1>SAHBI-SA <span>V6.2 DUAL GOLD</span></h1>
+<p class="sub">Lanceur local · Zero-Trust · DENY_ALL_EXCEPT_VERIFIED · <span class="tag">aucune requête réseau</span></p>
+
+<div class="card">
+<h2>1. Générer la clé Z_KEY (256 bits)</h2>
+<p class="sub" style="margin:0 0 8px">Générée dans votre navigateur, jamais envoyée ailleurs. Conservez-la hors ligne.</p>
+<div class="row"><button id="gen">Générer</button><button class="alt" id="cp-key">Copier la clé</button></div>
+<pre id="key">d30cb69287f385ecdf6c3790d67f7f444b02d68f814a3d96c2958f936199ec8c</pre>
+</div>
+
+<div class="card">
+<h2>2. Lancer Z-PUCE-1line.py</h2>
+<label>Système</label>
+<div class="row" style="margin:6px 0">
+<button class="alt" data-os="win">Windows</button>
+<button class="alt" data-os="nix">Linux / macOS</button>
+</div>
+<pre id="cmd">export Z_KEY=d30cb69287f385ecdf6c3790d67f7f444b02d68f814a3d96c2958f936199ec8c
+python3 Z-PUCE-1line.py</pre>
+<button id="cp-cmd">Copier la commande</button>
+</div>
+
+<div class="card">
+<h2>Important</h2>
+<p style="margin:0;color:var(--mut)">Une page HTML ne peut pas exécuter de programme sur votre machine (restriction du navigateur). Ce lanceur prépare la clé et la commande ; collez-la dans un terminal, dans le dossier contenant <code>Z-PUCE-1line.py</code>. Le chiffrement exige <code>pip install cryptography</code>.</p>
+</div>
+</main>
+
+
+
+</body></html>
+------MultipartBoundary--Mei5vFb23763JQrg4DVVPYl7nkc37eQ9kTAlqsL8uU----
+Content-Type: text/css
+Content-Transfer-Encoding: binary
+Content-Location: cid:css-2a707870-61b4-4921-8cae-b470ed56afd4@mhtml.blink
+
+@charset "utf-8";
+
+:root { --bg: #0e1116; --fg: #e6edf3; --mut: #8b949e; --card: #161b22; --br: #30363d; --gold: #d4a72c; --ok: #3fb950; }
+
+@media (prefers-color-scheme: light) {
+  :root { --bg: #f6f8fa; --fg: #1f2328; --mut: #59636e; --card: #fff; --br: #d1d9e0; --gold: #9a6700; --ok: #1a7f37; }
+}
+
+* { box-sizing: border-box; }
+
+body { margin: 0px; background: var(--bg); color: var(--fg); font: 16px / 1.5 system-ui, sans-serif; padding: 24px 16px; }
+
+main { max-width: 720px; margin: 0px auto; }
+
+h1 { font-size: 1.4rem; margin: 0px; }
+
+h1 span { color: var(--gold); }
+
+.sub { color: var(--mut); margin: 4px 0px 20px; }
+
+.card { background: var(--card); border: 1px solid var(--br); border-radius: 10px; padding: 16px; margin-bottom: 14px; }
+
+h2 { font-size: 1rem; margin: 0px 0px 8px; }
+
+pre { margin: 8px 0px; padding: 10px; background: var(--bg); border: 1px solid var(--br); border-radius: 6px; overflow-x: auto; font-size: 0.85rem; }
+
+button { background: var(--gold); color: rgb(0, 0, 0); border: 0px; border-radius: 6px; padding: 8px 14px; font-weight: 600; cursor: pointer; }
+
+button.alt { background: transparent; color: var(--fg); border: 1px solid var(--br); }
+
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.tag { color: var(--ok); font-size: 0.85rem; }
+
+label { color: var(--mut); font-size: 0.85rem; }
+------MultipartBoundary--Mei5vFb23763JQrg4DVVPYl7nkc37eQ9kTAlqsL8uU------

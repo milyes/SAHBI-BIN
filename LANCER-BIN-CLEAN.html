@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<title>SAHBI-SA V6.2 DUAL GOLD — Lanceur</title>
+<style>
+:root{--bg:#0e1116;--fg:#e6edf3;--mut:#8b949e;--card:#161b22;--br:#30363d;--gold:#d4a72c;--ok:#3fb950}
+@media (prefers-color-scheme:light){:root{--bg:#f6f8fa;--fg:#1f2328;--mut:#59636e;--card:#fff;--br:#d1d9e0;--gold:#9a6700;--ok:#1a7f37}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,sans-serif;padding:24px 16px}
+main{max-width:720px;margin:0 auto}
+h1{font-size:1.4rem;margin:0}h1 span{color:var(--gold)}
+.sub{color:var(--mut);margin:4px 0 20px}
+.card{background:var(--card);border:1px solid var(--br);border-radius:10px;padding:16px;margin-bottom:14px}
+h2{font-size:1rem;margin:0 0 8px}
+pre{margin:8px 0;padding:10px;background:var(--bg);border:1px solid var(--br);border-radius:6px;overflow-x:auto;font-size:.85rem}
+button{background:var(--gold);color:#000;border:0;border-radius:6px;padding:8px 14px;font-weight:600;cursor:pointer}
+button.alt{background:transparent;color:var(--fg);border:1px solid var(--br)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.tag{color:var(--ok);font-size:.85rem}
+.banner-line{margin:2px 0}
+.small{color:var(--mut);font-size:.78rem;margin-top:10px;line-height:1.4}
+label{color:var(--mut);font-size:.85rem}
+</style>
+</head>
+<body>
+<main>
+<h1>SAHBI-SA <span>V6.2 DUAL GOLD</span></h1>
+<p class="sub">Lanceur local · Zero-Trust · DENY_ALL_EXCEPT_VERIFIED · <span class="tag">aucune requête réseau</span></p>
+
+<div class="card" style="border-color:var(--gold)">
+<h2>SAHBI-SA V6.2 DUAL GOLD — Bannière validée TELUS</h2>
+<div class="banner-line">IA LOCALE ZERO-TRUST POUR PME</div>
+<div class="banner-line">100 % local · Aucune donnée ne sort</div>
+<div class="banner-line">AES-256-GCM + HMAC-SHA256</div>
+<div class="banner-line">Fail-Closed : DENY_ALL_EXCEPT_VERIFIED</div>
+<div class="banner-line">Builds FAST et FIPS avec OpenSSL</div>
+<div class="banner-line" style="margin-top:8px">Cibles : ~1,3 µs à chaud (en cours de mesure)</div>
+<div class="banner-line">État interne ≤ 872 octets (objectif de conception)</div>
+<div class="banner-line" style="margin-top:8px">Conçu pour faciliter la conformité à la Loi 25</div>
+<div class="banner-line" style="color:var(--gold);margin-top:8px">TELUS #AidonsNosPME 2026 · NetSecurePro</div>
+<div class="small">Version défendable - Pas de RECORD, pas de Threats blocked, pas de TLS 1.3, pas de COMPLIANT/CONFORME. Compatible FIPS 140-3 via module OpenSSL validé requis (non revendiqué comme certifié).</div>
+</div>
+
+<div class="card">
+<h2>1. Générer la clé Z_KEY (256 bits)</h2>
+<p class="sub" style="margin:0 0 8px">Générée dans votre navigateur via WebCrypto, jamais envoyée ailleurs. Conservez-la hors ligne.</p>
+<div class="row"><button id="gen">Générer</button><button class="alt" id="cp-key">Copier la clé</button></div>
+<pre id="key">—</pre>
+</div>
+
+<div class="card">
+<h2>2. Lancer Z-PUCE-1line.py</h2>
+<label>Système</label>
+<div class="row" style="margin:6px 0">
+<button class="alt" data-os="win">Windows</button>
+<button class="alt" data-os="nix">Linux / macOS</button>
+</div>
+<pre id="cmd">Générez d'abord la clé.</pre>
+<button id="cp-cmd">Copier la commande</button>
+</div>
+
+<div class="card">
+<h2>Important</h2>
+<p style="margin:0;color:var(--mut)">Une page HTML ne peut pas exécuter de programme sur votre machine (restriction du navigateur). Ce lanceur prépare la clé et la commande ; collez-la dans un terminal, dans le dossier contenant <code>Z-PUCE-1line.py</code>. Le chiffrement exige <code>pip install cryptography</code>. 100% local, fail-closed.</p>
+</div>
+</main>
+<script>
+let os="win",key="";
+const $=id=>document.getElementById(id);
+function cmd(){
+  if(!key){$("cmd").textContent="Générez d'abord la clé.";return}
+  $("cmd").textContent=os==="win"
+    ? 'set Z_KEY='+key+'\npython Z-PUCE-1line.py'
+    : 'export Z_KEY='+key+'\npython3 Z-PUCE-1line.py';
+}
+async function copy(t,b){
+  try{await navigator.clipboard.writeText(t);const o=b.textContent;b.textContent="Copié ✓";setTimeout(()=>b.textContent=o,1200)}catch(e){}
+}
+$("gen").onclick=()=>{
+  const a=crypto.getRandomValues(new Uint8Array(32));
+  key=[...a].map(x=>x.toString(16).padStart(2,"0")).join("");
+  $("key").textContent=key;cmd();
+};
+$("cp-key").onclick=e=>key&&copy(key,e.target);
+$("cp-cmd").onclick=e=>key&&copy($("cmd").textContent,e.target);
+document.querySelectorAll("[data-os]").forEach(b=>b.onclick=()=>{os=b.dataset.os;cmd()});
+</script>
+</body>
+</html>
