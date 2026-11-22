@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NetSecurePro IA – AI23N</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#eef1f4;--card:#fff;--ink:#12202b;--mut:#5b6b78;--line:#d3dae0;--ok:#0f7b6c;--warn:#c8541b;--q:#6b4fb3;--accent:#12202b;--accent-t:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1820;--card:#15242f;--ink:#e6edf2;--mut:#93a4b1;--line:#27394694;--ok:#3fc3ad;--warn:#ff8a4c;--q:#a590e8;--accent:#e6edf2;--accent-t:#0e1820}}
+:root[data-theme="dark"]{--bg:#0e1820;--card:#15242f;--ink:#e6edf2;--mut:#93a4b1;--line:#273946;--ok:#3fc3ad;--warn:#ff8a4c;--q:#a590e8;--accent:#e6edf2;--accent-t:#0e1820}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Schibsted Grotesk",system-ui,sans-serif}
+main{max-width:1000px;margin:0 auto;padding:20px 16px 48px}
+.banner{background:var(--warn);color:#fff;border-radius:8px;padding:8px 14px;font-weight:600;font-size:14px}
+h1{font-size:clamp(28px,6vw,46px);line-height:1.05;margin:22px 0 6px;font-weight:800;letter-spacing:-.02em}
+.sub{color:var(--mut);max-width:60ch;margin:0 0 20px}
+.grid{display:grid;gap:16px;grid-template-columns:1.4fr 1fr}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+h2{font-size:18px;margin:0 0 12px}
+.map{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.z{border:1.5px solid var(--line);border-radius:8px;padding:10px 4px;text-align:center;font-weight:600;font-size:13px;transition:background .3s,border-color .3s}
+.z small{display:block;font-weight:400;color:var(--mut);font-size:11px}
+.z.tesla{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.z.q{border-color:var(--q);border-style:dashed}
+.z.bad{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 22%,transparent)}
+.z.on-q{background:color-mix(in srgb,var(--q) 24%,transparent)}
+.score{font-size:64px;font-weight:800;line-height:1;margin:4px 0}
+.score.low{color:var(--warn)}
+.muted{color:var(--mut);font-size:14px}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+button{font:inherit;font-weight:600;border:1.5px solid var(--accent);background:var(--card);color:var(--ink);border-radius:8px;padding:10px 14px;cursor:pointer;min-height:44px}
+button.p{background:var(--accent);color:var(--accent-t)}
+button:focus-visible,textarea:focus-visible{outline:3px solid var(--ok);outline-offset:2px}
+.full{grid-column:1/-1}
+ul{list-style:none;padding:0;margin:0}
+li.t{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+li.t:last-child{border:0}
+.tag{font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--mut);white-space:nowrap;align-self:center}
+.tag.ok{color:var(--ok);border-color:var(--ok)}.tag.bad{color:var(--warn);border-color:var(--warn)}
+textarea{width:100%;min-height:150px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px;font:13px/1.4 ui-monospace,Menlo,monospace}
+.res{margin-top:12px;display:grid;gap:8px}
+.r{border-left:4px solid var(--ok);padding:6px 10px;background:var(--bg);border-radius:0 8px 8px 0;font-size:14px}
+.r.bad{border-color:var(--warn)}
+#log{max-height:180px;overflow:auto;font-size:13px;color:var(--mut)}
+#log div{padding:3px 0;border-bottom:1px solid var(--line)}
+footer{margin-top:24px;color:var(--mut);font-size:13px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<div class="banner">Mode simulation : aucun véhicule réel, aucun cluster réel. Les valeurs de posture sont des données de démonstration.</div>
+<h1>NetSecurePro IA</h1>
+<p class="sub">Console exécutive AI23N : micro-segmentation Zero Trust, segment Tesla S15 et audit RBAC. Le moteur de règles RBAC analyse réellement le JSON que vous fournissez.</p>
+
+<div class="grid">
+<section>
+<h2>Micro-segmentation (15 zones)</h2>
+<div class="map" id="map" role="img" aria-label="Carte des 15 zones de segmentation"></div>
+<p class="muted" id="mapnote">S15 Tesla actif. Le lien S13 est prêt pour la quarantaine.</p>
+<div class="btns">
+<button class="p" id="bViol">Simuler une violation</button>
+<button id="bReset">Réinitialiser</button>
+<button id="bTheme">Thème</button>
+</div>
+</section>
+
+<section>
+<h2>Score de confiance</h2>
+<div class="score" id="score">99 %</div>
+<p class="muted" id="scoreNote">Valeur de démonstration : 99 moins 5 points par violation simulée.</p>
+<ul>
+<li class="t"><span>Violations détectées</span><b id="nViol">0</b></li>
+<li class="t"><span>Batterie (SoH, démo)</span><b>95 %</b></li>
+<li class="t"><span>Mode</span><b>Ghost + Deny-All</b></li>
+</ul>
+</section>
+
+<section class="full">
+<h2>Contrôles Zero Trust (NIST SP 800-207)</h2>
+<p class="muted">Chaque principe est modélisé dans cette démo. Aucune vérification réelle n’est faite sur un système.</p>
+<ul id="tenets"></ul>
+<div class="btns"><button class="p" id="bScan">Lancer l’analyse des 7 principes</button></div>
+</section>
+
+<section class="full">
+<h2>Audit RBAC (JSON modifiable)</h2>
+<textarea id="rbac" spellcheck="false" aria-label="Liaisons de rôles au format JSON"></textarea>
+<div class="btns"><button class="p" id="bRbac">Auditer</button></div>
+<div class="res" id="res" aria-live="polite"></div>
+</section>
+
+<section class="full">
+<h2>Journal</h2>
+<div id="log"></div>
+</section>
+</div>
+<footer>© 2026 Mohammed Ilyes Zoubirou, NetSecurePro IA, Montréal. Prototype de démonstration.</footer>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const TENETS=["Toutes les ressources sont protégées","Communications sécurisées","Accès par session uniquement","Politique dynamique (IA22_LOGIC)","Surveillance continue de la posture","AuthN/AuthZ strictes","Télémétrie maximale"];
+let viol=0;
+const SAMPLE=[
+{user:"alice",role:"view",namespace:"default",verbs:["get","list","watch"],resources:["pods"]},
+{user:"bob",role:"cluster-admin",namespace:"*",verbs:["*"],resources:["*"]}
+];
+function log(m){const d=document.createElement("div");d.textContent=new Date().toLocaleTimeString("fr-CA")+"  "+m;$("log").prepend(d)}
+function drawMap(){
+ const m=$("map");m.innerHTML="";
+ for(let i=1;i<=15;i++){
+  const n=String(i).padStart(2,"0");const d=document.createElement("div");d.className="z";d.id="z"+i;
+  let sub="";
+  if(i===15){d.classList.add("tesla");sub="Tesla"}
+  if(i===13){d.classList.add("q");sub="Quarantaine"}
+  if(i===4)sub="Tunnel";
+  d.innerHTML="S"+n+"<small>"+sub+"</small>";m.appendChild(d)
+ }
+}
+function render(){
+ const s=Math.max(0,99-5*viol);
+ $("score").textContent=s+" %";$("score").classList.toggle("low",viol>0);
+ $("nViol").textContent=viol;
+ const t=$("z15"),q=$("z13");
+ t.classList.toggle("bad",viol>0);q.classList.toggle("on-q",viol>0);
+ $("mapnote").textContent=viol>0?"Violation simulée : S15 est isolé et son trafic est redirigé vers S13.":"S15 Tesla actif. Le lien S13 est prêt pour la quarantaine."
+}
+function drawTenets(state){
+ $("tenets").innerHTML=TENETS.map((t,i)=>{
+  const done=state>i;
+  return '<li class="t"><span>Principe '+(i+1)+' : '+t+'</span><span class="tag '+(done?'ok':'')+'">'+(done?'Modélisé':'En attente')+'</span></li>'}).join("")
+}
+$("bScan").onclick=async()=>{
+ log("Analyse des principes NIST SP 800-207 (démo)");
+ for(let i=0;i<=7;i++){drawTenets(i);await new Promise(r=>setTimeout(r,matchMedia("(prefers-reduced-motion: reduce)").matches?0:250))}
+ log("7 principes sur 7 modélisés. Ce n’est pas une certification de conformité.")
+};
+$("bViol").onclick=()=>{viol++;render();log("Violation simulée. Quarantaine automatique vers S13. Score : "+$("score").textContent)};
+$("bReset").onclick=()=>{viol=0;render();drawTenets(0);log("Réinitialisation")};
+$("bTheme").onclick=()=>{
+ const r=document.documentElement;
+ const dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+ r.dataset.theme=dark?"light":"dark"
+};
+function audit(b){
+ const reasons=[];
+ if(b.role==="cluster-admin")reasons.push("rôle cluster-admin");
+ if((b.verbs||[]).includes("*"))reasons.push("verbes « * »");
+ if((b.resources||[]).includes("*"))reasons.push("ressources « * »");
+ if(b.namespace==="*")reasons.push("tous les namespaces");
+ return reasons
+}
+$("bRbac").onclick=()=>{
+ const out=$("res");out.innerHTML="";
+ let data;
+ try{data=JSON.parse($("rbac").value);if(!Array.isArray(data))throw new Error("Le JSON doit être un tableau.")}
+ catch(e){out.innerHTML='<div class="r bad">JSON invalide : '+e.message.replace(/</g,"&lt;")+'</div>';return}
+ let anomalies=0;
+ data.forEach(b=>{
+  const rs=audit(b);const el=document.createElement("div");
+  const u=String(b.user).replace(/</g,"&lt;");
+  if(rs.length){anomalies++;el.className="r bad";el.textContent=u+" : risque élevé ("+rs.join(", ")+"). Recommandation : retirer "+(b.role||"ce rôle")+" et appliquer le moindre privilège."}
+  else el.textContent=u+" : aucun excès de privilège détecté (rôle "+b.role+", namespace "+b.namespace+")."
+  out.appendChild(el)
+ });
+ const s=document.createElement("div");s.className="r"+(anomalies?" bad":"");
+ s.textContent="Audit terminé : "+anomalies+" anomalie"+(anomalies>1?"s":"")+" sur "+data.length+" liaisons.";out.appendChild(s);
+ log("Audit RBAC : "+anomalies+" anomalie(s)")
+};
+$("rbac").value=JSON.stringify(SAMPLE,null,2);
+drawMap();drawTenets(0);render();log("Console AI23N prête (simulation)");
+</script>
+</body>
+</html>
