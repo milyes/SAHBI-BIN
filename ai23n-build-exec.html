@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI23N EXEC — Ubuntu Intelligence Standalone</title>
+  <style>
+    :root {
+      --ubuntu-orange: #E95420;
+      --ubuntu-purple: #772953;
+      --ubuntu-dark: #2c001e;
+      --neon-green: #87ff5f;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Ubuntu', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, var(--ubuntu-purple) 0%, var(--ubuntu-dark) 55%, #12000c 100%);
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      height: 44px;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      font-size: 13px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+    .actions { display: flex; gap: 8px; }
+    .btn {
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn:hover { background: rgba(255,255,255,0.16); }
+    .btn-primary { background: var(--ubuntu-orange); border-color: var(--ubuntu-orange); }
+    .btn-primary:hover { background: #d94410; }
+    main {
+      flex: 1;
+      max-width: 980px;
+      width: 100%;
+      margin: 24px auto;
+      padding: 0 18px;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 18px;
+    }
+    @media (max-width: 780px) { main { grid-template-columns: 1fr; } }
+    .panel {
+      background: rgba(15, 10, 18, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+    }
+    .panel-header {
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #ff9c78;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .console {
+      flex: 1;
+      min-height: 280px;
+      max-height: 380px;
+      overflow-y: auto;
+      padding: 16px;
+      font-family: 'Ubuntu Mono', ui-monospace, monospace;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #e2e8f0;
+    }
+    .line-sys { color: #94a3b8; }
+    .line-ok { color: var(--neon-green); }
+    .line-cmd { color: #ff9c78; font-weight: 700; }
+    .input-row {
+      display: flex;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      background: rgba(0,0,0,0.4);
+      padding: 10px 14px;
+      gap: 10px;
+      align-items: center;
+    }
+    .prompt { color: var(--neon-green); font-family: monospace; font-weight: 700; font-size: 13px; }
+    input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-family: monospace;
+      font-size: 13px;
+    }
+    .apps-list { padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+    .app-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      font-size: 13px;
+    }
+    .pill {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 700;
+      background: rgba(135, 255, 95, 0.14);
+      color: var(--neon-green);
+    }
+    .pill-idle { background: rgba(255,255,255,0.08); color: #94a3b8; }
+    .meta-box { padding: 14px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 12px; color: #94a3b8; display: grid; gap: 6px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="dot"></span>
+      <span>AI23N RUNTIME EXEC • Ubuntu Intelligence</span>
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="execCommand('status')">Statut Noyau</button>
+      <button class="btn btn-primary" onclick="exportSelfBin()">⬇ Export .BIN</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <div class="panel-header">
+        <span>Terminal Exécutable AI23N</span>
+        <span id="clock"></span>
+      </div>
+      <div id="console" class="console"></div>
+      <form class="input-row" onsubmit="handleSubmit(event)">
+        <span class="prompt">ai23n@exec:~$</span>
+        <input id="cmdInput" type="text" placeholder="Tapez help, status, apps, ping, clear..." autocomplete="off" />
+        <button type="submit" class="btn btn-primary">Exec</button>
+      </form>
+    </section>
+
+    <aside class="panel">
+      <div class="panel-header">
+        <span>Modules Embarqués</span>
+        <span id="appCount"></span>
+      </div>
+      <div id="appsList" class="apps-list"></div>
+      <div class="meta-box">
+        <div><strong>Format :</strong> HTML5 Standalone Exec</div>
+        <div><strong>Noyau :</strong> AI23N-BUILD v2.3</div>
+        <div id="buildTime"></div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const SNAPSHOT = {"appName":"Ubuntu Intelligence","version":"AI23N-v2.3","timestamp":"2026-11-22T11:02:09.069Z","apps":[{"id":"terminal","title":"Terminal - Noyau Gemini","isOpen":true},{"id":"terminal-alt","title":"Terminal Secondaire","isOpen":false},{"id":"ai-chat","title":"Chat IA - Assistant Neuronal","isOpen":true},{"id":"files","title":"Explorateur de fichiers","isOpen":false},{"id":"browser","title":"Navigateur Web","isOpen":false},{"id":"neo-browser","title":"NÉO WEB-EXPLORER","isOpen":false},{"id":"ubuntu-demo","title":"Démo API Ubuntu","isOpen":false},{"id":"vlc","title":"Lecteur Média VLC","isOpen":false},{"id":"orbital","title":"Émulateur Orbital PS4","isOpen":false},{"id":"ai23n","title":"AI23N Studio — Export BIN & HTML Exec","isOpen":false},{"id":"settings","title":"Paramètres","isOpen":false},{"id":"about","title":"À propos d'Ubuntu Intelligence","isOpen":false}]};
+    const consoleEl = document.getElementById('console');
+    const appsListEl = document.getElementById('appsList');
+    const cmdInput = document.getElementById('cmdInput');
+
+    function log(text, cls) {
+      const div = document.createElement('div');
+      if (cls) div.className = cls;
+      div.textContent = text;
+      consoleEl.appendChild(div);
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+
+    function renderMeta() {
+      document.getElementById('appCount').textContent = SNAPSHOT.apps.length + ' apps';
+      document.getElementById('buildTime').innerHTML = '<strong>Compilé :</strong> ' + new Date(SNAPSHOT.timestamp).toLocaleString('fr-FR');
+      appsListEl.innerHTML = '';
+      SNAPSHOT.apps.forEach(app => {
+        const row = document.createElement('div');
+        row.className = 'app-item';
+        row.innerHTML = '<span>' + app.title + '</span><span class="pill ' + (app.isOpen ? '' : 'pill-idle') + '">' + (app.isOpen ? 'ACTIF' : 'PRÊT') + '</span>';
+        appsListEl.appendChild(row);
+      });
+    }
+
+    function execCommand(raw) {
+      const cmd = raw.trim().toLowerCase();
+      if (!cmd) return;
+      log('ai23n@exec:~$ ' + raw, 'line-cmd');
+      if (cmd === 'clear') {
+        consoleEl.innerHTML = '';
+        return;
+      }
+      if (cmd === 'help') {
+        log('Commandes disponibles : help, status, apps, ping, bin, clear', 'line-ok');
+      } else if (cmd === 'status') {
+        log('[AI23N] Noyau opérationnel | Architecture HTML5 Exec | Modules: ' + SNAPSHOT.apps.length, 'line-ok');
+      } else if (cmd === 'apps') {
+        SNAPSHOT.apps.forEach(a => log(' - ' + a.id + ' (' + a.title + ')', 'line-sys'));
+      } else if (cmd === 'ping') {
+        log('64 bytes from ai23n-core: icmp_seq=1 ttl=64 time=0.04 ms', 'line-ok');
+      } else if (cmd === 'bin') {
+        exportSelfBin();
+      } else {
+        log('[AI23N EXEC] Commande exécutée : "' + raw + '" -> OK (0 ms)', 'line-ok');
+      }
+    }
+
+    function handleSubmit(e) {
+      e.preventDefault();
+      execCommand(cmdInput.value);
+      cmdInput.value = '';
+    }
+
+    function exportSelfBin() {
+      const encoder = new TextEncoder();
+      const payload = encoder.encode(document.documentElement.outerHTML);
+      const header = new Uint8Array([0x41, 0x49, 0x32, 0x33, 0x4E, 0x00, 0x02, 0x03]);
+      const bin = new Uint8Array(header.length + payload.length);
+      bin.set(header, 0);
+      bin.set(payload, header.length);
+      const blob = new Blob([bin], { type: 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'ai23n-runtime.bin';
+      a.click();
+      URL.revokeObjectURL(url);
+      log('[BIN] Export binaire ai23n-runtime.bin (' + bin.length + ' octets) lancé.', 'line-ok');
+    }
+
+    setInterval(() => {
+      document.getElementById('clock').textContent = new Date().toLocaleTimeString('fr-FR');
+    }, 1000);
+
+    renderMeta();
+    log('================================================', 'line-sys');
+    log('  AI23N BUILD HTML EXEC - RUNTIME INITIALISÉ', 'line-ok');
+    log('  Système: ' + SNAPSHOT.appName + ' (' + SNAPSHOT.version + ')', 'line-sys');
+    log('================================================', 'line-sys');
+    log('Tapez "help" pour voir les commandes exécutables.', 'line-sys');
+  </script>
+</body>
+</html>
