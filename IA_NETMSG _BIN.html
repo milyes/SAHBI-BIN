@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IA_NETMSG — BIN</title>
+<style>
+*{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#0f1115;color:#f2f2f2}
+header{padding:18px 22px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #262a33}
+header b{font-size:20px;letter-spacing:.5px} header b span{color:#22c55e}
+.badge{font-size:12px;padding:6px 10px;border-radius:999px;background:#1c2a1e;color:#4ade80;border:1px solid #2a4a30}
+.badge.off{background:#2a1c1c;color:#f87171;border-color:#4a2a2a}
+main{max-width:900px;margin:0 auto;padding:22px;display:grid;gap:18px}
+.card{background:#171a21;border:1px solid #262a33;border-radius:16px;padding:18px}
+.card h2{margin:0 0 6px;font-size:17px} .card p{margin:0 0 12px;color:#9aa3b2;font-size:13px}
+label{font-size:12px;color:#9aa3b2;display:block;margin:12px 0 6px}
+input,textarea,select{width:100%;background:#0f1115;color:#fff;border:1px solid #2a3442;border-radius:10px;padding:11px 12px;font:inherit;outline:none}
+textarea{min-height:110px;resize:vertical} input:focus,textarea:focus{border-color:#22c55e}
+.row{display:grid;grid-template-columns:1fr 120px;gap:10px}
+button{background:#22c55e;color:#06210f;border:0;border-radius:10px;padding:12px 16px;font-weight:700;cursor:pointer;width:100%;margin-top:12px}
+button:hover{background:#4ade80} button.ghost{background:transparent;color:#fff;border:1px solid #2a3442}
+pre{white-space:pre-wrap;background:#0b0d11;border:1px solid #262a33;border-radius:10px;padding:12px;font-size:13px;line-height:1.5;min-height:56px}
+.small{font-size:12px;color:#9aa3b2} .flex{display:flex;gap:10px} .flex>*{flex:1}
+code{background:#0b0d11;padding:2px 6px;border-radius:6px}
+</style>
+</head>
+<body>
+<header><b>IA_NETMSG <span>_BIN</span></b><span id="status" class="badge">● vérification…</span></header>
+<main>
+<div class="card">
+<h2>⚙️ Connexion API</h2><p>Par défaut localhost:8000. Change si tu passes par le tunnel Cloudflare.</p>
+<label>URL de l'API</label><input id="apiUrl" value="http://localhost:8000">
+<div class="flex"><button class="ghost" onclick="check()">Tester la connexion</button><button class="ghost" onclick="loadFeedback()">Voir les feedbacks</button></div>
+</div>
+
+<div class="card">
+<h2>🧠 Résumé IA</h2><p>Envoie un texte, récupère le résumé extractif.</p>
+<label>Ton texte</label><textarea id="txt" placeholder="Colle ton texte ici…">Bonjour. Ceci est un premier test très long pour vérifier le résumé extractif qui doit garder les phrases les plus importantes. Courte. Encore une phrase très longue avec beaucoup d'informations utiles pour le test de résumé automatique. Fin.</textarea>
+<button onclick="doSummarize()">Résumer →</button>
+<label>Résultat</label><pre id="outSum">—</pre>
+</div>
+
+<div class="card">
+<h2>💬 Feedback</h2><p>Sauvegardé dans feedback_data.csv sur le serveur.</p>
+<div class="row"><div><label>Nom</label><input id="name" value="Ilyes"></div><div><label>Note / 5</label><select id="rating"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></div></div>
+<label>Message</label><textarea id="msg" placeholder="Ton retour…"></textarea>
+<button onclick="sendFeedback()">Envoyer le feedback</button>
+<label>Feedbacks reçus</label><pre id="outFb">—</pre>
+</div>
+
+<div class="card"><p class="small">Mode d'emploi : 1) <code>bash start_local.sh</code> ou <code>bash start_cloudflare.sh</code> &nbsp; 2) Ouvre ce fichier <code>_BIN.HTML</code> &nbsp; 3) Si tu es sur le tunnel, colle l'URL <code>https://xxx.trycloudflare.com</code> dans le champ API ci-dessus.</p></div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const api=()=>$('apiUrl').value.replace(/\/$/,'');
+async function check(){
+  try{ const r=await fetch(api()+'/health'); const j=await r.json();
+    $('status').textContent='● EN LIGNE — '+j.status; $('status').className='badge';
+  }catch(e){ $('status').textContent='● HORS LIGNE — lance start_local.sh'; $('status').className='badge off'; }
+}
+async function doSummarize(){
+  $('outSum').textContent='…';
+  try{ const r=await fetch(api()+'/summarize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:$('txt').value})});
+    const j=await r.json(); $('outSum').textContent=j.summary||JSON.stringify(j);
+  }catch(e){ $('outSum').textContent='Erreur : API hors ligne. Vérifie l\'URL ci-dessus.'; }
+}
+async function sendFeedback(){
+  try{ const r=await fetch(api()+'/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:$('name').value,message:$('msg').value,rating:parseInt($('rating').value)})});
+    const j=await r.json(); $('outFb').textContent='✅ Sauvegardé : '+JSON.stringify(j); $('msg').value=''; loadFeedback();
+  }catch(e){ $('outFb').textContent='Erreur : API hors ligne.'; }
+}
+async function loadFeedback(){
+  try{ const r=await fetch(api()+'/feedback'); const j=await r.json();
+    $('outFb').textContent=j.feedbacks.length? j.feedbacks.map(f=>`⭐ ${f.rating}/5 — ${f.name} : ${f.message}`).join('\n\n') : 'Aucun feedback pour le moment.';
+  }catch(e){ $('outFb').textContent='Erreur : API hors ligne.'; }
+}
+check();
+</script>
+</body>
+</html>
