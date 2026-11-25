@@ -82,7 +82,7 @@
 </div>
 
 <script>
-  const HASH = "e8287c079388408f64488a7d6c751d7c499698b6c74a4d608e441c1f49788b7a";
+  const HASH = "[MOCK-SHA]";
   async function sha256(str) {
     const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
