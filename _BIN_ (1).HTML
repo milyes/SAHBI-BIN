@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>_BIN_.HTML — Moteur WebCrypto Autonome AI23N v4.1</title>
+  <style>
+    :root {
+      --bg: #0b0f17;
+      --surface: #111827;
+      --border: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #e95420;
+      --ok: #16a34a;
+      --err: #dc2626;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+      line-height: 1.5;
+    }
+    .container { max-width: 1120px; margin: 0 auto; display: grid; gap: 20px; }
+    header {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      gap: 12px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+    }
+    .title { font-size: 18px; font-weight: 700; }
+    .meta { font-size: 12px; color: var(--muted); font-family: ui-monospace, monospace; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .btn {
+      border: 1px solid var(--border); background: var(--surface); color: var(--text);
+      padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+      cursor: pointer; white-space: nowrap;
+    }
+    .btn:hover { border-color: #475569; }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn-primary:hover { filter: brightness(1.08); }
+    .grid { display: grid; grid-template-columns: 360px 1fr; gap: 20px; }
+    @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+    .panel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 18px; display: grid; gap: 14px; align-content: start;
+    }
+    label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+    input[type="password"], input[type="file"] {
+      width: 100%; background: #0b0f17; border: 1px solid var(--border);
+      color: var(--text); padding: 9px 12px; border-radius: 8px; font-size: 13px;
+    }
+    .status { font-size: 12px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: #0b0f17; }
+    .status-ok { border-color: rgba(22,163,74,0.45); color: #86efac; }
+    .status-err { border-color: rgba(220,38,38,0.45); color: #fca5a5; }
+    .file-list { display: grid; gap: 8px; }
+    .file-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: #0b0f17;
+      font-size: 12px; cursor: pointer;
+    }
+    .file-row:hover { border-color: #475569; }
+    iframe { width: 100%; height: 340px; border: 1px solid var(--border); border-radius: 8px; background: #05080f; }
+    pre {
+      background: #05080f; border: 1px solid var(--border); border-radius: 8px;
+      padding: 12px; font-size: 12px; overflow: auto; max-height: 300px;
+      font-family: ui-monospace, monospace; color: #cbd5e1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <div class="title">_BIN_.HTML — Moteur WebCrypto Autonome AI23N</div>
+        <div class="meta">Zero-Trust · Offline · RAM-Only · AES-256-GCM + PBKDF2-SHA256 (300 000 itérations)</div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="btnExportMd">Exporter AI23N_SPEC.md</button>
+        <button class="btn" id="btnExportJson">Exporter AI23N_SPEC.json</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="panel">
+        <div>
+          <label for="binInput">Conteneur AI23N_V3 (.bin)</label>
+          <input type="file" id="binInput" accept=".bin,application/octet-stream" />
+        </div>
+        <div>
+          <label for="passInput">Phrase secrète de déchiffrement (RAM-Only)</label>
+          <input type="password" id="passInput" placeholder="Saisir la phrase secrète..." autocomplete="off" />
+        </div>
+        <button class="btn btn-primary" id="btnDecrypt">Déchiffrer en mémoire vive</button>
+        <div id="statusBox" class="status">En attente d'un conteneur .bin ou d'un coffre embarqué.</div>
+        <div>
+          <label>Fichiers extraits en RAM</label>
+          <div id="fileList" class="file-list"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div>
+          <label>Prévisualisation isolée (&lt;iframe sandbox=""&gt;)</label>
+          <iframe id="sandboxFrame" sandbox="" title="Prévisualisation isolée AI23N"></iframe>
+        </div>
+        <div>
+          <label>Contenu brut inspecté en mémoire</label>
+          <pre id="rawPreview">Aucun fichier sélectionné.</pre>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const SPEC_MD = "# AI23N — Spécifications Techniques & Architecture Forensic\n\n## 1. Vue d'ensemble\nSystème d'extraction, d'anonymisation, d'intégrité cryptographique et de confinement hors-ligne conçu pour l'analyse de données numériques (exports Facebook, Google Takeout, journaux système) en environnement **Zero Trust**.\n\n## 2. Composants de la suite\n* **`AI23N_BUILD.sh` (Moteur Python/Bash) :** Parseur multi-sources, masquage d'identifiants sensibles (IMEI, Android ID, numéros de série), génération de rapport HTML, scellement binaire (`AI23N_BIN_V3`) et création d'image disque ISO 9660 native.\n* **`webapp.py` (Console locale HTTP) :** Serveur Python isolé sur `127.0.0.1:8080` pour la vérification HMAC-SHA256 et le déchiffrement en mémoire vive des fichiers `.bin` et `.iso`.\n* **`_BIN_.HTML` (Moteur WebCrypto autonome) :** Interface HTML/JS autonome utilisant l'API native `SubtleCrypto` (**AES-256-GCM** + **PBKDF2-SHA256**) avec prévisualisation isolée (`<iframe sandbox=\"\">`).\n\n## 3. Garanties Cryptographiques\n* **Confidentialité :** Chiffrement symétrique 256 bits (AES-GCM ou CTR-HMAC-SHA256).\n* **Dérivation de clé :** PBKDF2-HMAC-SHA256 avec sel aléatoire de 128 bits (300 000 itérations).\n* **Intégrité & Authenticité :** Empreintes SHA-256 par fichier source, validation GCM/HMAC avant tout déchiffrement et support d'Arbre de Merkle.\n* **Isolation :** Aucune requête réseau sortante, aucun stockage en clair lors de la lecture.\n";
+      const SPEC_JSON = "{\n  \"project\": \"AI23N Forensic & Vault Suite\",\n  \"version\": \"4.1\",\n  \"architecture\": \"Zero-Trust / Offline / RAM-Only\",\n  \"modules\": [\n    {\n      \"name\": \"AI23N_BUILD.sh\",\n      \"runtime\": \"Bash + Python 3 (Standard Library)\",\n      \"outputs\": [\n        \"AI23N_FORENSIC_REPORT.html\",\n        \"AI23N_VAULT.bin\",\n        \"AI23N_FORENSIC_VAULT.iso\"\n      ],\n      \"crypto\": \"PBKDF2-HMAC-SHA256 + CTR-SHA256 + HMAC-SHA256\"\n    },\n    {\n      \"name\": \"webapp.py\",\n      \"runtime\": \"Python 3 http.server (127.0.0.1:8080)\",\n      \"supported_formats\": [\n        \".bin\",\n        \".iso\"\n      ],\n      \"execution_mode\": \"In-Memory Decryption\"\n    },\n    {\n      \"name\": \"_BIN_.HTML\",\n      \"runtime\": \"Browser WebCrypto API (SubtleCrypto)\",\n      \"crypto\": \"AES-256-GCM + PBKDF2-SHA256 (300,000 iterations)\",\n      \"isolation\": \"HTML5 iframe sandbox\"\n    }\n  ],\n  \"security_properties\": {\n    \"network_access\": false,\n    \"pii_masking\": true,\n    \"tamper_detection\": \"SHA-256 + AEAD Tag / HMAC\"\n  }\n}";
+      const EMBEDDED_VAULT_B64 = null;
+      const MAGIC = [0x41, 0x49, 0x32, 0x33, 0x4e, 0x5f, 0x56, 0x33];
+
+      let loadedBytes = null;
+      let decryptedFiles = [];
+
+      if (EMBEDDED_VAULT_B64) {
+        const raw = atob(EMBEDDED_VAULT_B64);
+        loadedBytes = new Uint8Array(raw.length);
+        for (let i = 0; i < raw.length; i++) loadedBytes[i] = raw.charCodeAt(i);
+        setStatus('Coffre binaire AI23N_V3 embarqué (' + loadedBytes.length + ' octets). Saisissez la phrase secrète.', 'ok');
+      }
+
+      function setStatus(msg, kind) {
+        const el = document.getElementById('statusBox');
+        el.textContent = msg;
+        el.className = 'status' + (kind === 'ok' ? ' status-ok' : kind === 'err' ? ' status-err' : '');
+      }
+
+      function downloadFile(name, content, mime) {
+        const blob = new Blob([content], { type: mime });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = name;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      document.getElementById('btnExportMd').addEventListener('click', function() {
+        downloadFile('AI23N_SPEC.md', SPEC_MD, 'text/markdown;charset=utf-8');
+        setStatus('Exporté : AI23N_SPEC.md', 'ok');
+      });
+
+      document.getElementById('btnExportJson').addEventListener('click', function() {
+        downloadFile('AI23N_SPEC.json', SPEC_JSON, 'application/json;charset=utf-8');
+        setStatus('Exporté : AI23N_SPEC.json', 'ok');
+      });
+
+      document.getElementById('binInput').addEventListener('change', async function(e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const buf = await file.arrayBuffer();
+        loadedBytes = new Uint8Array(buf);
+        setStatus('Conteneur chargé en RAM : ' + file.name + ' (' + loadedBytes.length + ' octets).', 'ok');
+      });
+
+      document.getElementById('btnDecrypt').addEventListener('click', async function() {
+        try {
+          if (!loadedBytes) throw new Error('Veuillez charger un fichier .bin.');
+          const pass = document.getElementById('passInput').value;
+          if (!pass) throw new Error('Phrase secrète requise.');
+          for (let i = 0; i < MAGIC.length; i++) {
+            if (loadedBytes[i] !== MAGIC[i]) throw new Error('En-tête AI23N_V3 invalide.');
+          }
+          const view = new DataView(loadedBytes.buffer, loadedBytes.byteOffset, loadedBytes.byteLength);
+          let off = MAGIC.length;
+          const iterations = view.getUint32(off, false); off += 4;
+          const salt = loadedBytes.slice(off, off + 16); off += 16;
+          const iv = loadedBytes.slice(off, off + 12); off += 12;
+          const ctLen = view.getUint32(off, false); off += 4;
+          const ct = loadedBytes.slice(off, off + ctLen);
+
+          const keyMat = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']);
+          const key = await crypto.subtle.deriveKey(
+            { name: 'PBKDF2', salt: salt, iterations: iterations, hash: 'SHA-256' },
+            keyMat,
+            { name: 'AES-GCM', length: 256 },
+            false,
+            ['decrypt']
+          );
+          const pt = await crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv: iv, additionalData: new Uint8Array(MAGIC), tagLength: 128 },
+            key,
+            ct
+          );
+          const payload = JSON.parse(new TextDecoder().decode(new Uint8Array(pt)));
+          decryptedFiles = payload.files || [];
+          renderFiles();
+          setStatus('Déchiffrement AES-256-GCM réussi (' + decryptedFiles.length + ' fichiers en RAM).', 'ok');
+        } catch (err) {
+          setStatus(err && err.message ? err.message : 'Erreur de déchiffrement.', 'err');
+        }
+      });
+
+      function renderFiles() {
+        const list = document.getElementById('fileList');
+        list.innerHTML = '';
+        decryptedFiles.forEach(function(f, idx) {
+          const row = document.createElement('div');
+          row.className = 'file-row';
+          row.textContent = f.name + ' (' + f.content.length + ' o)';
+          row.addEventListener('click', function() { selectFile(idx); });
+          list.appendChild(row);
+        });
+        if (decryptedFiles.length > 0) selectFile(0);
+      }
+
+      function selectFile(idx) {
+        const f = decryptedFiles[idx];
+        if (!f) return;
+        document.getElementById('rawPreview').textContent = f.content;
+        const frame = document.getElementById('sandboxFrame');
+        if (f.name.toLowerCase().endsWith('.html')) {
+          frame.srcdoc = f.content;
+        } else {
+          frame.srcdoc = '<pre style="color:#e2e8f0;font-family:monospace;padding:12px;white-space:pre-wrap">' +
+            f.content.replace(/[&<>]/g, function(c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]; }) +
+            '</pre>';
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
