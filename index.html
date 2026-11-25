@@ -66,36 +66,15 @@
     <div class="card">
       <h2>02 · Lanceur Web AI23N</h2>
       <p>Interface de build et d'exécution directe sans installation serveur.</p>
-      <a href="./ai23n-build-exec.html">Lancer l'interface →</a>
-    </div>
-    <div class="card">
-      <h2>03 · Station Échelon 7</h2>
-      <p>Dépôt principal de gouvernance IA et supervision réseau NetSecure Pro.</p>
-      <a href="https://github.com" target="_blank">Voir sur GitHub →</a>
-    </div>
-  </div>
-
-  <footer>
-    PROTOCOLE IA22_LOGIC : 0001 VOIX · 0002 VÉRITÉ · 0003 SOUVERAINETÉ · 0004 ÉTHIQUE · 0005 RÉSILIENCE · 0006 ÉMERGENCE<br>
-    <em>« Posséder le code ne suffit pas. »</em>
-  </footer>
-</div>
-
 <script>
-  const HASH = "[MOCK-SHA]";
-  async function sha256(str) {
-    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
-  }
   function showApp() {
     document.getElementById("gate").style.display = "none";
     document.getElementById("app").style.display = "block";
   }
   if (sessionStorage.getItem("ai23n_auth") === "1") showApp();
-  function unlock() { if (btoa(document.getElementById("pwd").value.trim()) === "MTc3Ng==") { sessionStorage.setItem("ai23n_auth", "1"); showApp(); return; }
+  function unlock() {
     const val = document.getElementById("pwd").value.trim();
-    const h = await sha256(val);
-    if (h === HASH) {
+    if (btoa(val) === "MTc3Ng==") {
       sessionStorage.setItem("ai23n_auth", "1");
       showApp();
     } else {
